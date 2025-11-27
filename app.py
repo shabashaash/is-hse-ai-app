@@ -7,9 +7,13 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import mean_squared_error as MSE, r2_score
 
+MAIN_DIR = Path(__file__).resolve().parent 
+PIPELINE_PATH = MAIN_DIR / 'prediction_pipeline.pkl'
+
+
 @st.cache_resource
 def load_pipeline():
-    return joblib.load('prediction_pipeline.pkl')
+    return joblib.load(PIPELINE_PATH)
 
 @st.cache_data
 def load_data(uploaded_file):
@@ -165,4 +169,5 @@ if uploaded_file is not None:
     display_visualizations(df, df_viz)
     display_predictions_and_metrics(pipeline, df)
 else:
+
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
