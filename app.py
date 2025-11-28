@@ -26,32 +26,33 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
     
     def transform(self, X):
         X = X.copy()
+
         if 'name' in X.columns:
             X['name'] = X['name'].str.split().str[0]
-    
+
         if 'torque' in X.columns:
             conv_ = np.where(X['torque'].str.contains('nm', case=False, na=False), 9.80665, 1)
         
-        parse_cols = [c for c in self.missing_cols if c != 'seats']
-        for c in parse_cols:
-            if c != 'torque':
-                X[c] = X[c].str.split().str[0]
+        parse_cols = [col for col in self.missing_cols if col != 'seats']
+        for col in parse_cols:
+            if col != 'torque':
+                X[col] = X[col].str.split().str[0]
             else:
-                X[c] = X[c].str.extract(r'([0-9]*\.?[0-9]+)', expand=False)
+                X[col] = X[col].str.extract(r'([0-9]*\.?[0-9]+)', expand=False)
         
         for col in self.missing_cols:
-            X[col] = pd.to_numeric(X[c], errors='coerce')
+            X[col] = pd.to_numeric(X[col], errors='coerce')
         
         if 'torque' in X.columns:
             X['torque'] /= conv_
         
-        for c in self.impute_columns:
-            if c in X.columns:
-                X[c] = X[c].fillna(self.medians[c])
-
-        for c in ['engine', 'seats']:
-            if c in X.columns:
-                X[c] = X[c].astype(int, errors='ignore')
+        for col in self.impute_columns:
+            if col in X.columns:
+                X[col] = X[col].fillna(self.medians[col])
+        
+        for col in ['engine', 'seats']:
+            if col in X.columns:
+                X[col] = X[col].astype(int, errors='ignore')
         
         return X
 
@@ -203,12 +204,14 @@ uploaded_file = st.file_uploader("Upload CSV for Predictions/EDA", type="csv")
 if uploaded_file is not None:
     raw_df = load_data(uploaded_file)
     preprocessed_df = pipeline.named_steps['preprocess'].transform(raw_df.copy())
+    print(pipeline.named_steps['preprocess'])
     df_viz = prepare_viz_data(preprocessed_df)
     display_data_overview(preprocessed_df)
     display_visualizations(df_viz)
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
