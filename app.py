@@ -6,6 +6,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from pathlib import Path
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import mean_squared_error as MSE, r2_score
 
@@ -213,6 +215,7 @@ if uploaded_file is not None:
 else:
 
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
