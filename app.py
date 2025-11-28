@@ -70,14 +70,6 @@ def display_model_details(pipeline):
     feature_names = list(ohe_cols) + list(pipeline.named_steps['col_transform'].named_transformers_['passthrough'].feature_names_in_)
     
     st.sidebar.title("Model Details")
-    
-    st.sidebar.subheader("Model Weights (Coefficients)")
-    coef_df = pd.DataFrame({
-        'Feature': feature_names,
-        'Coefficient': model.coef_
-    })
-    st.sidebar.dataframe(coef_df)
-    
     st.sidebar.subheader("Feature Importance (Abs Coefficient)")
     importance_df = coef_df.copy()
     importance_df['Abs Coefficient'] = np.abs(importance_df['Coefficient'])
@@ -107,10 +99,10 @@ def display_data_overview(df):
     st.write(df.sample(30))
     
     st.subheader("Data Head")
-    st.write(df.head(5))
+    st.write(df.head(10))
     
     st.subheader("Data Tail")
-    st.write(df.tail(5))
+    st.write(df.tail(10))
     
     st.subheader("Missing Value Columns")
     st.write(df.columns[df.isnull().any()])
@@ -206,15 +198,16 @@ display_model_details(pipeline)
 uploaded_file = st.file_uploader("Upload CSV for Predictions/EDA", type="csv")
 
 if uploaded_file is not None:
-    df = load_data(uploaded_file)
-    df_viz = prepare_viz_data(df)
+    raw_df = load_data(uploaded_file)
+    preprocessed_df = pipeline.named_steps['preprocess'].transform(raw_df.copy())
+    df_viz = prepare_viz_data(preprocessed_df)
     
-    display_data_overview(df)
+    display_data_overview(preprocessed_df)
     display_visualizations(df, df_viz)
-    display_predictions_and_metrics(pipeline, df)
+    display_predictions_and_metrics(pipeline, raw_df)
 else:
-
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
