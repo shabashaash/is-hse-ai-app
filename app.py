@@ -65,10 +65,12 @@ def load_data(uploaded_file):
 
 def display_model_details(pipeline):
     model = pipeline.named_steps['model']
-    scaler = pipeline.named_steps['scaler']
     ohe_cols = pipeline.named_steps['col_transform'].named_transformers_['ohe'].get_feature_names_out()
     feature_names = list(ohe_cols) + list(pipeline.named_steps['col_transform'].named_transformers_['passthrough'].feature_names_in_)
-    
+    coef_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Coefficient': model.coef_
+    })
     st.sidebar.title("Model Details")
     st.sidebar.subheader("Feature Importance (Abs Coefficient)")
     importance_df = coef_df.copy()
@@ -207,6 +209,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
