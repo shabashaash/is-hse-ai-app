@@ -194,13 +194,12 @@ uploaded_file = st.file_uploader("Upload CSV for Predictions/EDA", type="csv")
 
 if uploaded_file is not None:
     raw_df = load_data(uploaded_file)
-    preprocessed_df = pipeline.named_steps['preprocess'].transform(raw_df.copy())
-    df_viz = prepare_viz_data(preprocessed_df)
-    display_data_overview(preprocessed_df)
-    display_visualizations(df_viz)
+    display_data_overview(raw_df)
+    display_visualizations(prepare_viz_data(pipeline.named_steps['preprocess'].transform(raw_df.copy())))
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
