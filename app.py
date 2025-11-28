@@ -67,7 +67,7 @@ def display_model_details(pipeline):
     model = pipeline.named_steps['model']
     scaler = pipeline.named_steps['scaler']
     ohe_cols = pipeline.named_steps['col_transform'].named_transformers_['ohe'].get_feature_names_out()
-    feature_names = list(ohe_cols) + pipeline.named_steps['col_transform'].named_transformers_['passthrough'].feature_names_in_
+    feature_names = list(ohe_cols) + list(pipeline.named_steps['col_transform'].named_transformers_['passthrough'].feature_names_in_)
     
     st.sidebar.title("Model Details")
     
@@ -197,8 +197,8 @@ def display_predictions_and_metrics(pipeline, df):
         st.write(f'R^2: {r2_score(y_true, predictions)}')
         st.write(f"Business Metric: {np.mean((np.abs(predictions - y_true) / y_true) <= 0.10)}")
 
-# Main app
-st.title("Car Price Prediction App with EDA")
+
+st.title("Pred and EDA")
 
 pipeline = load_pipeline()
 display_model_details(pipeline)
@@ -215,6 +215,7 @@ if uploaded_file is not None:
 else:
 
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
