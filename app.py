@@ -49,11 +49,11 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
         
         return X
 
-@st.cache_resource
+
 def load_pipeline():
     return joblib.load(PIPELINE_PATH)
 
-@st.cache_data
+
 def load_data(uploaded_file):
     return pd.read_csv(uploaded_file)
 
@@ -203,6 +203,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
