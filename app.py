@@ -11,6 +11,46 @@ from sklearn.metrics import mean_squared_error as MSE, r2_score
 MAIN_DIR = Path(__file__).resolve().parent 
 PIPELINE_PATH = MAIN_DIR / 'prediction_pipeline.pkl'
 
+#придется здесь тоже класс обозначать :(
+class CombinedPreprocessor(BaseEstimator, TransformerMixin):
+    def __init__(self, missing_cols, medians, impute_columns):
+        self.missing_cols = missing_cols
+        self.medians = medians
+        self.impute_columns = impute_columns
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X = X.copy()
+        if 'name' in X.columns:
+            X['name'] = X['name'].str.split().str[0]
+    
+        if 'torque' in X.columns:
+            conv_ = np.where(X['torque'].str.contains('nm', case=False, na=False), 9.80665, 1)
+        
+        parse_cols = [c for c in self.missing_cols if c != 'seats']
+        for c in parse_cols:
+            if c != 'torque':
+                X[c] = X[c].str.split().str[0]
+            else:
+                X[c] = X[c].str.extract(r'([0-9]*\.?[0-9]+)', expand=False)
+        
+        for col in self.missing_cols:
+            X[col] = pd.to_numeric(X[c], errors='coerce')
+        
+        if 'torque' in X.columns:
+            X['torque'] /= conv_
+        
+        for c in self.impute_columns:
+            if c in X.columns:
+                X[c] = X[c].fillna(self.medians[c])
+
+        for c in ['engine', 'seats']:
+            if c in X.columns:
+                X[c] = X[c].astype(int, errors='ignore')
+        
+        return X
 
 @st.cache_resource
 def load_pipeline():
@@ -172,4 +212,5 @@ if uploaded_file is not None:
 else:
 
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
