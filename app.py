@@ -61,14 +61,11 @@ def display_model_details(pipeline):
     feature_names = list(ohe_cols) + list(pipeline.named_steps['col_transform'].named_transformers_['passthrough'].feature_names_in_)
     coef_df = pd.DataFrame({
         'Feature': feature_names,
-        'Coefficient': model.coef_
+        'Abs Coefficient': abs(model.coef_)
     })
     st.sidebar.title("Model Details")
     st.sidebar.subheader("Feature Importance (Abs Coefficient)")
-    importance_df = coef_df.copy()
-    importance_df['Abs Coefficient'] = np.abs(importance_df['Coefficient'])
-    importance_df = importance_df.sort_values(by='Abs Coefficient', ascending=False)
-    st.sidebar.dataframe(importance_df)
+    st.sidebar.dataframe(coef_df.sort_values(by='Abs Coefficient', ascending=False))
     
     st.sidebar.subheader("Intercept")
     st.sidebar.write(model.intercept_)
@@ -199,6 +196,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
