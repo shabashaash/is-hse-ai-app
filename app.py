@@ -47,10 +47,11 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
         
         return X
 
-@st.cache_resource
+
 def load_pipeline():
     return joblib.load(PIPELINE_PATH)
-
+    
+@st.cache_data
 def load_data(uploaded_file):
     return pd.read_csv(uploaded_file)
 
