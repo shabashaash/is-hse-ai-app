@@ -25,8 +25,6 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
         return self
     
     def transform(self, X):
-        X = X.copy()
-
         if 'name' in X.columns:
             X['name'] = X['name'].str.split().str[0]
 
@@ -37,11 +35,11 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
         )
 
         conv_ = np.where(X['torque'].str.contains('nm', case=False, na=False), 9.80665, 1)
-        for col in missing_cols:
+        for col in self.missing_cols:
             X[col] = pd.to_numeric(X[col], errors = 'coerce')
         X['torque'] /= conv_
         
-        
+        print(self.impute_columns)
         for col in self.impute_columns:
             if col in X.columns:
                 print(col, self.medians[col])
@@ -207,6 +205,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
