@@ -180,6 +180,7 @@ def display_visualizations(df):
         st.pyplot(fig_rel)
 
 def display_predictions_and_metrics(pipeline, df):
+    print(df)
     predictions = pipeline.predict(df)
     st.subheader("Predictions")
     st.write(pd.DataFrame({'Predictions': predictions}, index=df.index))
@@ -208,6 +209,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
