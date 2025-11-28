@@ -30,29 +30,24 @@ class CombinedPreprocessor(BaseEstimator, TransformerMixin):
         if 'name' in X.columns:
             X['name'] = X['name'].str.split().str[0]
 
-        if 'torque' in X.columns:
-            conv_ = np.where(X['torque'].str.contains('nm', case=False, na=False), 9.80665, 1)
+        X[self.missing_cols[:-1]] = X[self.missing_cols[:-1]].apply(
+            lambda x: x.str.split().str[0]
+            if x.name != 'torque' 
+            else x.str.extract(r'([0-9]*\.?[0-9]+)', expand=False) 
+        )
+
+        conv_ = np.where(X['torque'].str.contains('nm', case=False, na=False), 9.80665, 1)
+        for col in missing_cols:
+            X[col] = pd.to_numeric(X[col], errors = 'coerce')
+        X['torque'] /= conv_
         
-        parse_cols = [col for col in self.missing_cols if col != 'seats']
-        for col in parse_cols:
-            if col != 'torque':
-                X[col] = X[col].str.split().str[0]
-            else:
-                X[col] = X[col].str.extract(r'([0-9]*\.?[0-9]+)', expand=False)
-        
-        for col in self.missing_cols:
-            X[col] = pd.to_numeric(X[col], errors='coerce')
-        
-        if 'torque' in X.columns:
-            X['torque'] /= conv_
         
         for col in self.impute_columns:
             if col in X.columns:
+                print(col, self.medians[col])
                 X[col] = X[col].fillna(self.medians[col])
         
-        for col in ['engine', 'seats']:
-            if col in X.columns:
-                X[col] = X[col].astype(int, errors='ignore')
+        X[['engine', 'seats']] = X[['engine', 'seats']].astype(int)
         
         return X
 
@@ -212,6 +207,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
