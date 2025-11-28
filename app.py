@@ -115,7 +115,7 @@ def display_data_overview(df):
     st.subheader("Object Description")
     st.write(df.describe(include='object'))
 
-def display_visualizations(df, df_viz):
+def display_visualizations(df):
     num_cols = df.select_dtypes(include=['number']).columns.tolist()
     
     st.subheader("Pairplot (Numeric Columns)")
@@ -129,11 +129,11 @@ def display_visualizations(df, df_viz):
         st.pyplot(fig_heat)
     
     st.subheader("Violin Plot: Selling Price by Usage Intensity and Fuel")
-    if all(col in df_viz.columns for col in ['usage_intensity', 'selling_price', 'fuel']):
+    if all(col in df.columns for col in ['usage_intensity', 'selling_price', 'fuel']):
         with st.container():
             fig_violin, ax_violin = plt.subplots(figsize=(16, 8))
             sns.violinplot(
-                data=df_viz,
+                data=df,
                 x='usage_intensity',
                 y='selling_price',
                 hue='fuel',
@@ -208,6 +208,7 @@ if uploaded_file is not None:
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
