@@ -205,10 +205,11 @@ if uploaded_file is not None:
     df_viz = prepare_viz_data(preprocessed_df)
     
     display_data_overview(preprocessed_df)
-    display_visualizations(df, df_viz)
+    display_visualizations(preprocessed_df, df_viz)
     display_predictions_and_metrics(pipeline, raw_df)
 else:
     st.write("Upload a CSV file to see EDA, visualizations, and predictions.")
+
 
 
 
